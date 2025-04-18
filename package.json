@@ -1,0 +1,28 @@
+{
+   "name": "jodna-portfolio",
+   "version": "1.0.0",
+   "description": "",
+   "main": "server.js",
+   "type": "module",
+   "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+   },
+   "repository": {
+      "type": "git",
+      "url": "git+https://github.com/FruitfulEjiro/Jodna-portfolio.git"
+   },
+   "author": "Fruitful Ejiro",
+   "license": "ISC",
+   "bugs": {
+      "url": "https://github.com/FruitfulEjiro/Jodna-portfolio/issues"
+   },
+   "homepage": "https://github.com/FruitfulEjiro/Jodna-portfolio#readme",
+   "dependencies": {
+      "dotenv": "^16.5.0",
+      "express": "^5.1.0",
+      "express-async-handler": "^1.2.0",
+      "mongodb": "^6.15.0",
+      "mongoose": "^8.13.2",
+      "nodemon": "^3.1.9"
+   }
+}
