@@ -18,11 +18,10 @@ const createSendToken = (user, code, res) => {
 
    res.cookie("jwt", token, cookieOptions).json({
       status: "Success",
-      message: code === 201 ? "User Created Successfully" : "Login Successful",
+      message: "successful",
       data: {
          user,
       },
-      redirect: "/",
    });
    user.password = undefined;
 };

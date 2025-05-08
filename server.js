@@ -4,6 +4,9 @@ import dotenv from "dotenv";
 import connectDB from "./model/DB.js";
 import app from "./app.js";
 
+// Events
+import "./events/eventListener.js";
+
 // set up env file
 dotenv.config();
 

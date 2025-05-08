@@ -4,15 +4,21 @@ import CookieParser from "cookie-parser";
 // Local Modules
 import ErrorHandler from "./utils/ErrorHandler.js";
 import authRoutes from "./routes/authRoutes.js";
+import projectRoutes from "./routes/projectRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import analyticsRoutes from "./routes/analyticsRoutes.js";
 
 const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded());
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(CookieParser());
 
 // Routes
-app.use("/auth", authRoutes)
+app.use("/auth", authRoutes);
+app.use("/user", userRoutes);
+app.use("/project", projectRoutes);
+app.use("/analytics", analyticsRoutes);
 
 app.use(ErrorHandler);
 

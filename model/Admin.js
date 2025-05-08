@@ -3,7 +3,7 @@ import validator from "validator";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
-const UserSchema = new mongoose.Schema({
+const AdminSchema = new mongoose.Schema({
    fullname: {
       firstname: {
          type: String,
@@ -58,6 +58,7 @@ const UserSchema = new mongoose.Schema({
    phone: {
       type: String,
       trim: true,
+      required: false,
       validate: {
          validator: (value) => {
             return validator.isMobilePhone(value, "any", { strictMode: false });
@@ -75,9 +76,8 @@ const UserSchema = new mongoose.Schema({
    },
    role: {
       type: String,
-      enum: ["user", "admin"],
-      default: "user",
-      select: false,
+      enum: ["admin"],
+      default: "admin",
    },
    createdAt: {
       type: Date,
@@ -102,15 +102,15 @@ const UserSchema = new mongoose.Schema({
 
 // MONGOOSE MIDDLEWARE
 // Hash password before saving to database
-UserSchema.pre("save", async function (next) {
-   if (this.isModified("password") || this.isNew) {
+AdminSchema.pre("save", async function (next) {
+   if (this.isModified("password")) {
       this.password = await bcrypt.hash(this.password, 10);
    }
    next();
 });
 
 // Document middleware to set passwordChangedAt date whwnever password is updated by user
-UserSchema.pre("save", function (next) {
+AdminSchema.pre("save", function (next) {
    if (!this.isModified("password") || this.isNew) return next();
    this.passwordChangedAt = Date.now() - 1000;
    next();
@@ -119,13 +119,13 @@ UserSchema.pre("save", function (next) {
 // INSTANCE METHODS
 
 // Method to compare password
-UserSchema.methods.comparePassword = async function (password) {
+AdminSchema.methods.comparePassword = async function (password) {
    return await bcrypt.compare(password, this.password);
 };
 
 // Method to create a password reset token
-UserSchema.methods.createPasswordResetToken = async function () {
-   const resetToken = crypto.randomBytes(8).toString("hex");
+AdminSchema.methods.createPasswordResetToken = async function () {
+   const resetToken = crypto.randomBytes(32).toString("hex");
 
    this.passwordResetToken = crypto.createHash("sha256").update(resetToken).digest("hex");
    this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
@@ -133,12 +133,12 @@ UserSchema.methods.createPasswordResetToken = async function () {
    return resetToken;
 };
 
-UserSchema.methods.changedPasswordAt = function (JWTTimeStamp) {
+AdminSchema.methods.changedPasswordAt = function (JWTTimeStamp) {
    if (this.passwordChangedAt) {
       return JWTTimeStamp < this.passwordChangedAt;
    }
 };
 
-const User = mongoose.model("User", UserSchema);
+const Admin = mongoose.model("Admin", AdminSchema);
 
-export default User;
+export default Admin;
