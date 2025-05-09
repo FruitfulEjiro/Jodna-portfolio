@@ -1,7 +1,7 @@
 import express from "express";
 
 // Local Modules
-import { protect } from "../controller/authController.js";
+import { protect, restrict } from "../controller/authController.js";
 import {
    createProject,
    updateProject,
@@ -21,7 +21,7 @@ const router = express.Router();
 router
    .post("/create", protect, createProject)
    .post("/draft", protect, saveDraft)
-   .get("/all", getProjects)
+   .get("/all", protect, restrict, getProjects)
    .get("/duration", getProjectByDuration)
    .get("/tech", getProjectByTech)
    .get("/name", getProjectByName)

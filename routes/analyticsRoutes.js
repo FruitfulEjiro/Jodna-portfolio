@@ -9,8 +9,11 @@ import {
    getHighestViewedTech,
    getUniqueViewers,
 } from "../controller/analyticsController.js";
+import { protect, restrict } from "../controller/authController.js";
 
 const router = express.Router();
+
+router.use(protect);
 
 router
    .get("/most-used-tech", getMostUsedTech)
@@ -18,6 +21,6 @@ router
    .get("/project-created-within", getProjectCreatedIn)
    .get("/most-viewed-project", getHighestViewedProject)
    .get("/most-viewed-tech", getHighestViewedTech)
-   .get("/unique-viewers/:id", getUniqueViewers);
+   .get("/unique-viewers/:id", restrict, getUniqueViewers);
 
 export default router;
