@@ -44,16 +44,15 @@ const ProjectSchema = new mongoose.Schema({
       required: true,
       enum: ["draft", "published"],
       default: "published",
+      select: false,
+   },
+   created_at: {
+      type: Date,
+      default: Date.now,
    },
 });
 
 ProjectSchema.index({ project_name: "text", project_description: "text", tech: "text" });
-
-// mongoose middleware
-ProjectSchema.post("findOne", function (next) {
-   this.total_views = this.total_views + 1;
-   next();
-});
 
 const Project = new mongoose.model("Project", ProjectSchema);
 

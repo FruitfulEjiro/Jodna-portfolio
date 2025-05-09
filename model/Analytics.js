@@ -17,7 +17,7 @@ const analyticsSchema = new mongoose.Schema({
       required: false,
       lowercase: true,
    },
-   createdAt: {
+   created_at: {
       type: Date,
       default: Date.now,
    },

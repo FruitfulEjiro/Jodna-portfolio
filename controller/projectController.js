@@ -216,12 +216,12 @@ export const getProjectById = CatchAsync(async (req, res, next) => {
    // emit project:viewed event
    Event.emit("project:viewed", {
       projectId: project._id,
-      userId: req.user._id,
       techArray: project.tech,
    });
 
    Event.emit("unique:user", {
-      userId: req.user._id,
+      projectId: project._id,
+      userId: req.user ? req.user._id : 0,
    });
 
    res.status(200).json({
@@ -267,7 +267,7 @@ export const getProjectByTech = CatchAsync(async (req, res, next) => {
 
    Event.emit("tech:searched", {
       projectId: project._id,
-      userId: req.user._id,
+      userId: req.user ? req.user._id : null,
       techArray,
    });
 

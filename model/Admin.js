@@ -79,7 +79,7 @@ const AdminSchema = new mongoose.Schema({
       enum: ["admin"],
       default: "admin",
    },
-   createdAt: {
+   created_at: {
       type: Date,
       default: Date.now,
    },

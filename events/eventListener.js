@@ -3,6 +3,7 @@ import CatchAsync from "express-async-handler";
 
 // Local Modules
 import Analytics from "../model/Analytics.js";
+import Project from "../model/Project.js";
 
 // Listen for when a project is created
 eventEmitter.on(
@@ -12,7 +13,7 @@ eventEmitter.on(
          analytics_type: "project:created",
          userId,
          projectId,
-         createdAt: new Date(),
+         created_at: new Date(),
       });
 
       // save tags used
@@ -24,7 +25,7 @@ eventEmitter.on(
                   userId,
                   projectId,
                   tech,
-                  createdAt: new Date(),
+                  created_at: new Date(),
                })
             )
          );
@@ -44,7 +45,7 @@ eventEmitter.on(
                   userId,
                   projectId,
                   tech,
-                  createdAt: new Date(),
+                  created_at: new Date(),
                })
             )
          );
@@ -54,11 +55,14 @@ eventEmitter.on(
 // listen for unique viewers
 eventEmitter.on(
    "unique:user",
-   CatchAsync(async ({ userId }) => {
+   CatchAsync(async ({ projectId, userId }) => {
+      if (userId == 0) return;
+      if (await Analytics.findOne(userId)) return;
       await Analytics.create({
          analytics_type: "unique:user",
+         projectId,
          userId,
-         createdAt: new Date(),
+         created_at: new Date(),
       });
    })
 );
@@ -67,19 +71,22 @@ eventEmitter.on(
 eventEmitter.on(
    "project:viewed",
    CatchAsync(async ({ userId, projectId, techArray }) => {
-      if (techArray.length > 0) {
+      // log project viewed
+      await Project.findByIdAndUpdate(projectId, { $inc: { total_views: 1 } });
+
+      // log tech viewed
+      if (techArray.length > 0)
          await Promise.all(
             techArray.map((tech) =>
                Analytics.create({
-                  analytics_type: "project:viewed",
+                  analytics_type: "tech:viewed",
                   userId,
                   projectId,
                   tech,
-                  createdAt: new Date(),
+                  created_at: new Date(),
                })
             )
          );
-      }
    })
 );
 
