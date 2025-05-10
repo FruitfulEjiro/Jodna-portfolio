@@ -89,5 +89,3 @@ eventEmitter.on(
          );
    })
 );
-
-console.log("Event listeners loaded ✅");

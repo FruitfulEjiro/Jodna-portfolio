@@ -38,16 +38,13 @@ export const loginAdmin = CatchAsync(async (req, res, next) => {
    const { email, password } = req.body;
 
    // Check if email and password exist
-   if (!email || !password) {
-      return next(new AppError("Please Provide Email and Password", 400));
-   }
+   if (!email || !password) return next(new AppError("Please Provide Email and Password", 400));
 
    // Find User by email
    const admin = await Admin.findOne({ email }).select("+password");
 
-   if (!admin || !(await admin.comparePassword(password))) {
+   if (!admin || !(await admin.comparePassword(password)))
       return next(new AppError("Incorrect Email or Password", 401));
-   }
 
    const adminObj = admin.toObject();
 
@@ -86,17 +83,13 @@ export const login = CatchAsync(async (req, res, next) => {
    const { email, password } = req.body;
 
    // Check if email and password exist
-   if (!email || !password) {
-      return next(new AppError("Please Provide Email and Password", 400));
-   }
+   if (!email || !password) return next(new AppError("Please Provide Email and Password", 400));
 
    // Find User by email
 
    const user = await User.findOne({ email }).select("+password");
 
-   if (!user || !(await user.comparePassword(password))) {
-      return next(new AppError("Incorrect Email or Password", 401));
-   }
+   if (!user || !(await user.comparePassword(password))) return next(new AppError("Incorrect Email or Password", 401));
 
    const userObj = user.toObject();
 
@@ -113,9 +106,7 @@ export const forgotPassword = CatchAsync(async (req, res, next) => {
    // Get user from Database
    let user;
    (await User.findOne({ email })) ? (user = await User.findOne({ email })) : (user = await Admin.findOne({ email }));
-   if (!user) {
-      return next(new AppError("No User with this Email was found", 404));
-   }
+   if (!user) return next(new AppError("No User with this Email was found", 404));
    // Generate random reset token
    const resetToken = await user.createPasswordResetToken();
    await user.save({ validatebeforeSave: false });
@@ -177,9 +168,7 @@ export const resetPassword = CatchAsync(async (req, res, next) => {
         }));
 
    // If user is found and token has not expires, set new password
-   if (!user) {
-      return next(new AppError("Token is invalid or expired", 401));
-   }
+   if (!user) return next(new AppError("Token is invalid or expired", 401));
 
    user.password = req.body.password;
    user.passwordResetToken = undefined;
@@ -206,16 +195,12 @@ export const updatePassword = CatchAsync(async (req, res, next) => {
    if (!user) return next(new AppError("User not found, Login to change your password", 404));
 
    // Check if password is correct
-   if (!(await user.comparePassword(password))) {
-      return next(new AppError("Incorrect Password", 401));
-   }
+   if (!(await user.comparePassword(password))) return next(new AppError("Incorrect Password", 401));
 
    // Update password
    user.password = newPassword;
    const saveUser = await user.save({ validateBeforeSave: true });
-   if (!saveUser) {
-      return next(new AppError("Could not update password", 500));
-   }
+   if (!saveUser) return next(new AppError("Could not update password", 500));
 
    // Log in user
    const userObj = user.toObject();
@@ -234,16 +219,12 @@ export const updateAdminPassword = CatchAsync(async (req, res, next) => {
    if (!admin) return next(new AppError("Admin not found, Login to change your password", 404));
 
    // Check if password is correct
-   if (!(await admin.comparePassword(password))) {
-      return next(new AppError("Incorrect Password", 401));
-   }
+   if (!(await admin.comparePassword(password))) return next(new AppError("Incorrect Password", 401));
 
    // Update password
    admin.password = newPassword;
    const saveAdmin = await admin.save({ validateBeforeSave: true });
-   if (!saveAdmin) {
-      return next(new AppError("Could not update password", 500));
-   }
+   if (!saveAdmin) return next(new AppError("Could not update password", 500));
 
    // Log in user
    const adminObj = admin.toObject();
@@ -258,56 +239,28 @@ export const protect = CatchAsync(async (req, res, next) => {
    // Retrieve the token from cookie
    let token = req.cookies.jwt;
 
-   if (!token) {
-      res.status(401).json({
-         status: "Failed",
-         message: "You are not Logged in",
-         redirect: "/login",
-      });
-      return next(new AppError("You are not Logged in", 401));
-   }
+   if (!token) return next(new AppError("You are not Logged in", 401));
 
    // Verify JWT
    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-   if (!decoded) {
-      res.status(401).json({
-         status: "Failed",
-         message: "You are not Logged in",
-         redirect: "/login",
-      });
-      return next(new AppError("You are not Logged in", 401));
-   }
+   if (!decoded) return next(new AppError("You are not Logged in", 401));
 
    // Find User by id from decoded token
    const user = await User.findById(decoded.id);
    if (user) {
       // Check if user changed password after token was issued
-      if (user.changedPasswordAt(decoded.iat)) {
-         res.status(401).json({
-            status: "Failed",
-            message: "User changed password, Login again",
-         });
-         return next(new AppError("User changed password, Login again", 401));
-      }
+      if (user.changedPasswordAt(decoded.iat)) return next(new AppError("User changed password, Login again", 401));
 
       // Grant user access to the Protected Routes
       req.user = user;
       next();
    }
-
    if (!user) {
       const admin = await Admin.findById(decoded.id);
       if (!admin) return next(new AppError("The User belonging to this token no longer exists", 401));
 
       // Check if user changed password after token was issued
-      if (admin.changedPasswordAt(decoded.iat)) {
-         res.status(401).json({
-            status: "Failed",
-            message: "Password has been changed, Login again",
-         });
-         return next(new AppError("User changed password, Login again", 401));
-      }
+      if (admin.changedPasswordAt(decoded.iat)) return next(new AppError("User changed password, Login again", 401));
 
       // Grant user access to the Protected Routes
       req.user = admin;
@@ -318,16 +271,15 @@ export const protect = CatchAsync(async (req, res, next) => {
 // Authorization middleware
 export const restrict = CatchAsync(async (req, res, next) => {
    // Check if user is admin
-   if (req.user.role !== "admin") {
-      return next(new AppError("You do not have permission to perform this action", 403));
-   }
+   if (req.user.role !== "admin") return next(new AppError("You do not have permission to perform this action", 403));
    next();
 });
 
 // Logout
 export const logout = CatchAsync(async (req, res, next) => {
    // Clear cookie
-   res.status(200)
+   return res
+      .status(200)
       .cookie("jwt", "loggedout", {
          expires: new Date(Date.now() + 5 * 1000),
          httpOnly: true,

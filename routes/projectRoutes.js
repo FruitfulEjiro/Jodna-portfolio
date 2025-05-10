@@ -14,6 +14,8 @@ import {
    publishDraft,
    deleteDraft,
    getProjects,
+   getProjectByUser,
+   getProjectByOwnUser,
 } from "../controller/projectController.js";
 
 const router = express.Router();
@@ -25,6 +27,8 @@ router
    .get("/duration", getProjectByDuration)
    .get("/tech", getProjectByTech)
    .get("/name", getProjectByName)
+   .get("/user", protect, getProjectByOwnUser)
+   .get("/user/:id", protect, restrict, getProjectByUser)
    .get("/:id", getProjectById)
    .patch("/update/:id", protect, updateProject)
    .patch("/publish/:id", protect, publishDraft)

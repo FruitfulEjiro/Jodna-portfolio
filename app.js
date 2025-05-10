@@ -7,6 +7,7 @@ import authRoutes from "./routes/authRoutes.js";
 import projectRoutes from "./routes/projectRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
+import saveRoutes from "./routes/saveItemRoutes.js";
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/project", projectRoutes);
 app.use("/analytics", analyticsRoutes);
+app.use("/item", saveRoutes);
 
 app.use(ErrorHandler);
 

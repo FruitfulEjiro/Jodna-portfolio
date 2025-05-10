@@ -7,7 +7,7 @@ import AppError from "../utils/AppError.js";
 import Event from "../events/eventEmitter.js";
 
 export const createProject = CatchAsync(async (req, res, next) => {
-   const { project_name, project_duration, project_image, tech, project_description } = req.body;
+   const { project_name, project_duration, project_image, tech, project_url, project_description } = req.body;
    const user = req.user;
 
    let imageObj = {};
@@ -24,6 +24,7 @@ export const createProject = CatchAsync(async (req, res, next) => {
       project_image: imageObj,
       project_duration,
       tech,
+      project_url: project_url ? project_url : "",
       project_description,
    });
 
@@ -49,7 +50,7 @@ export const createProject = CatchAsync(async (req, res, next) => {
 });
 
 export const saveDraft = CatchAsync(async (req, res, next) => {
-   const { project_name, project_duration, project_image, tech, project_description } = req.body;
+   const { project_name, project_duration, project_image, tech, project_url, project_description } = req.body;
    const user = req.user;
 
    let imageObj = {};
@@ -66,6 +67,7 @@ export const saveDraft = CatchAsync(async (req, res, next) => {
       project_image: imageObj,
       project_duration,
       tech,
+      project_url: project_url ? project_url : "",
       project_description,
       status: "draft",
    };
@@ -88,7 +90,7 @@ export const saveDraft = CatchAsync(async (req, res, next) => {
 });
 
 export const publishDraft = CatchAsync(async (req, res, next) => {
-   const { project_name, project_duration, project_image, tech, project_description } = req.body;
+   const { project_name, project_duration, project_image, tech, project_url, project_description } = req.body;
    const user = req.user;
    const { id } = req.params;
 
@@ -111,6 +113,7 @@ export const publishDraft = CatchAsync(async (req, res, next) => {
       project_image: imageObj || draftProject.project_image,
       project_duration: project_duration || draftProject.project_duration,
       tech: tech || draftProject.tech,
+      project_url: project_url ? project_url : "",
       project_description: project_description || draftProject.project_description,
       status: "published",
    };
@@ -149,7 +152,7 @@ export const deleteDraft = CatchAsync(async (req, rex, next) => {
 });
 
 export const updateProject = CatchAsync(async (req, res, next) => {
-   const { project_name, project_image, project_duration, tech, project_description } = req.body;
+   const { project_name, project_image, project_duration, tech, project_url, project_description } = req.body;
    const { id } = req.params;
 
    const project = await Project.findById(id);
@@ -173,6 +176,7 @@ export const updateProject = CatchAsync(async (req, res, next) => {
    if (project_image) project.project_image = imageObj;
    if (project_duration) project.project_duration = project_duration;
    if (tech) project.tech = tech;
+   if (project_url) project.project_url = project_url;
    if (project_description) project.project_description = project_description;
 
    // Save project
@@ -227,6 +231,38 @@ export const getProjectById = CatchAsync(async (req, res, next) => {
    res.status(200).json({
       status: "success",
       message: project.length == 0 ? "No project found" : "project retrieved successfully",
+      data: {
+         project,
+      },
+   });
+});
+
+export const getProjectByOwnUser = CatchAsync(async (req, res, next) => {
+   const user = req.user;
+
+   const project = await Project.find({ user: user._id }).populate("user", "fullname");
+   if (!project) return next(new AppError("No project found", 404));
+
+   res.status(200).json({
+      status: "success",
+      message: project.length == 0 ? "No project found" : "project retrieved successfully",
+      result: project.length,
+      data: {
+         project,
+      },
+   });
+});
+
+export const getProjectByUser = CatchAsync(async (req, res, next) => {
+   const {id} = req.params;
+
+   const project = await Project.find({ user: id }).populate("user", "fullname");
+   if (!project) return next(new AppError("No project found", 404));
+
+   res.status(200).json({
+      status: "success",
+      message: project.length == 0 ? "No project found" : "project retrieved successfully",
+      result: project.length,
       data: {
          project,
       },

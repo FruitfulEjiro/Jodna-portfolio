@@ -39,6 +39,10 @@ const ProjectSchema = new mongoose.Schema({
       type: String,
       required: false,
    },
+   project_url: {
+      type: String,
+      required: false,
+   },
    status: {
       type: String,
       required: true,
