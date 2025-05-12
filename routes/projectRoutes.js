@@ -16,6 +16,7 @@ import {
    getProjects,
    getProjectByUser,
    getProjectByOwnUser,
+   getDrafts,
 } from "../controller/projectController.js";
 
 const router = express.Router();
@@ -23,6 +24,7 @@ const router = express.Router();
 router
    .post("/create", protect, createProject)
    .post("/draft", protect, saveDraft)
+   .get("/get-all-draft", protect, getDrafts)
    .get("/all", protect, restrict, getProjects)
    .get("/duration", getProjectByDuration)
    .get("/tech", getProjectByTech)

@@ -151,6 +151,22 @@ export const deleteDraft = CatchAsync(async (req, rex, next) => {
    });
 });
 
+export const getDrafts = CatchAsync(async (req, res, next) => {
+   const user = req.user;
+
+   const drafts = await Project.find({ user: user._id, status: "draft" }).sort({ created_at: 1 });
+   if (!drafts) return next(new AppError("No drafts found", 404));
+
+   res.status(200).json({
+      status: "success",
+      message: drafts.length == 0 ? "No drafts found" : "Drafts retrieved successfully",
+      results: drafts.length,
+      data: {
+         drafts,
+      },
+   });
+});
+
 export const updateProject = CatchAsync(async (req, res, next) => {
    const { project_name, project_image, project_duration, tech, project_url, project_description } = req.body;
    const { id } = req.params;
@@ -254,7 +270,7 @@ export const getProjectByOwnUser = CatchAsync(async (req, res, next) => {
 });
 
 export const getProjectByUser = CatchAsync(async (req, res, next) => {
-   const {id} = req.params;
+   const { id } = req.params;
 
    const project = await Project.find({ user: id }).populate("user", "fullname");
    if (!project) return next(new AppError("No project found", 404));
