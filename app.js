@@ -1,5 +1,6 @@
 import express from "express";
 import CookieParser from "cookie-parser";
+import cors from "cors";
 
 // Local Modules
 import ErrorHandler from "./utils/ErrorHandler.js";
