@@ -60,10 +60,11 @@ const UserSchema = new mongoose.Schema({
       trim: true,
       validate: {
          validator: (value) => {
-            return validator.isMobilePhone(value, "any", { strictMode: false });
+            return value === "nil" || validator.isMobilePhone(value, "any", { strictMode: false });
          },
          message: "Invalid phone number",
       },
+      default: "nil",
    },
    avatar: {
       public_id: {

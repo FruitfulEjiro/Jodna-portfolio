@@ -57,7 +57,7 @@ export const loginAdmin = CatchAsync(async (req, res, next) => {
 
 // Signup User
 export const signup = CatchAsync(async (req, res) => {
-   const { firstname, lastname, email, password, gender } = req.body;
+   const { firstname, lastname, email, password, gender, phone } = req.body;
 
    const duplicate = Admin.findOne({ email });
    if (!duplicate) return next(new AppError("A user with this email already Exists", 400));
@@ -70,6 +70,7 @@ export const signup = CatchAsync(async (req, res) => {
       email,
       password,
       gender: gender || "rather not say",
+      phone
    });
 
    if (!user) return next(new AppError("Error creating account!! Try again", 500));
@@ -246,9 +247,6 @@ export const protect = CatchAsync(async (req, res, next) => {
    // Verify JWT
    const decoded = jwt.verify(token, process.env.JWT_SECRET);
    if (!decoded) return next(new AppError("You are not Logged in", 401));
-
-   console.log(decoded);
-   console.log(new Date(decoded.exp * 1000));
 
    // Find User by id from decoded token
    const user = await User.findById(decoded.id);

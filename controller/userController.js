@@ -17,7 +17,7 @@ export const updateAdmin = CatchAsync(async (req, res, next) => {
    // upload avatar to cloudinary
    let imageObj = {};
    if (avatar) {
-      if (updateUser.avatar) {
+      if (updateUser.avatar.public_id) {
          // delete old avatar from cloudinary
          const deleteImage = await deleteImageCloudinary(updateUser.avatar.public_id);
          if (!deleteImage) return next(new AppError("Couldnt delete Image!! Try again", 500));
@@ -30,20 +30,17 @@ export const updateAdmin = CatchAsync(async (req, res, next) => {
    }
 
    // Update user details
-   updateAdmin.fullname.firstname = firstname || updateAdmin.fullname.firstname;
-   updateAdmin.fullname.lastname = lastname || updateAdmin.fullname.lastname;
-   updateAdmin.email = email || updateAdmin.email;
-   updateAdmin.phone = phone || updateAdmin.phone;
-   updateAdmin.avatar = imageObj || updateAdmin.avatar;
-   updateAdmin.gender = imageObj || updateAdmin.gender;
-
-   await admin.save({ validateBeforeSave: true });
+   const findAdmin = await User.findByIdAndUpdate(
+      user._id,
+      { $set: { avatar: imageObj, firstname, lastname, phone, gender } },
+      { new: true }
+   );
 
    res.status(200).json({
       status: "success",
       message: "Admin updated successfully",
       data: {
-         admin,
+         findAdmin,
       },
    });
 });
@@ -59,7 +56,7 @@ export const updateUser = CatchAsync(async (req, res, next) => {
    // upload avatar to cloudinary
    let imageObj = {};
    if (avatar) {
-      if (updateUser.avatar) {
+      if (updateUser.avatar.public_id) {
          // delete old avatar from cloudinary
          const deleteImage = await deleteImageCloudinary(updateUser.avatar.public_id);
          if (!deleteImage) return next(new AppError("Couldnt delete Image!! Try again", 500));
@@ -70,28 +67,19 @@ export const updateUser = CatchAsync(async (req, res, next) => {
       imageObj.image_url = result.secure_url;
       imageObj.public_id = result.public_id;
    }
-   console.log(imageObj);
 
+   // Update user details
    const findUser = await User.findByIdAndUpdate(
       user._id,
-      { $set: { avatar: imageObj }, $set: { firstname }, $set: { lastname }, $set: { phone }, $set: { gender } },
+      { $set: { avatar: imageObj, firstname, lastname, phone, gender } },
       { new: true }
    );
-
-   // // Update user details
-   // updateUser.fullname.firstname = firstname || updateUser.fullname.firstname;
-   // updateUser.fullname.lastname = lastname || updateUser.fullname.lastname;
-   // updateUser.phone = phone || updateUser.phone;
-   // updateUser.avatar = imageObj || updateUser.avatar;
-   // updateUser.gender = gender || updateUser.gender;
-
-   // await user.save({ validateBeforeSave: true });
 
    res.status(200).json({
       status: "success",
       message: "User updated successfully",
       data: {
-         user,
+         findUser,
       },
    });
 });
