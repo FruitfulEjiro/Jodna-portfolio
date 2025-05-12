@@ -17,9 +17,9 @@ export const updateAdmin = CatchAsync(async (req, res, next) => {
    // upload avatar to cloudinary
    let imageObj = {};
    if (avatar) {
-      if (updateUser.avatar.public_id) {
+      if (updateAdmin.avatar.public_id) {
          // delete old avatar from cloudinary
-         const deleteImage = await deleteImageCloudinary(updateUser.avatar.public_id);
+         const deleteImage = await deleteImageCloudinary(updateAdmin.avatar.public_id);
          if (!deleteImage) return next(new AppError("Couldnt delete Image!! Try again", 500));
       }
       // upload new avatar to cloudinary
@@ -31,7 +31,7 @@ export const updateAdmin = CatchAsync(async (req, res, next) => {
 
    // Update user details
    const findAdmin = await User.findByIdAndUpdate(
-      user._id,
+      admin._id,
       { $set: { avatar: imageObj, firstname, lastname, phone, gender } },
       { new: true }
    );
