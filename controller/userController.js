@@ -30,11 +30,12 @@ export const updateAdmin = CatchAsync(async (req, res, next) => {
    }
 
    // Update user details
-   const findAdmin = await User.findByIdAndUpdate(
+   const findAdmin = await Admin.findByIdAndUpdate(
       admin._id,
       { $set: { avatar: imageObj, firstname, lastname, phone, gender } },
       { new: true }
    );
+   if (!findAdmin) return next(new AppError("Couldn't update admin. Try again!!", 500));
 
    res.status(200).json({
       status: "success",
@@ -74,6 +75,7 @@ export const updateUser = CatchAsync(async (req, res, next) => {
       { $set: { avatar: imageObj, firstname, lastname, phone, gender } },
       { new: true }
    );
+   if (!findUser) return next(new AppError("Couldn't update user. Try again!!", 500));
 
    res.status(200).json({
       status: "success",
