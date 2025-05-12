@@ -78,7 +78,7 @@ export const updateUser = CatchAsync(async (req, res, next) => {
    updateUser.email = email || updateUser.email;
    updateUser.phone = phone || updateUser.phone;
    updateUser.avatar = imageObj || updateUser.avatar;
-   updateUser.gender = imageObj || updateUser.gender;
+   updateUser.gender = gender || updateUser.gender;
 
    await user.save({ validateBeforeSave: true });
 

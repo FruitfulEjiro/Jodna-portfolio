@@ -247,6 +247,9 @@ export const protect = CatchAsync(async (req, res, next) => {
    const decoded = jwt.verify(token, process.env.JWT_SECRET);
    if (!decoded) return next(new AppError("You are not Logged in", 401));
 
+   console.log(decoded);
+   console.log(new Date(decoded.exp * 1000));
+
    // Find User by id from decoded token
    const user = await User.findById(decoded.id);
    if (user) {
@@ -256,8 +259,7 @@ export const protect = CatchAsync(async (req, res, next) => {
       // Grant user access to the Protected Routes
       req.user = user;
       return next();
-   }
-   if (!user) {
+   } else if (!user) {
       const admin = await Admin.findById(decoded.id);
       if (!admin) return next(new AppError("The User belonging to this token no longer exists", 401));
 
@@ -267,6 +269,8 @@ export const protect = CatchAsync(async (req, res, next) => {
       // Grant user access to the Protected Routes
       req.user = admin;
       return next();
+   } else {
+      return next(new AppError("The User belonging to this token no longer exists", 401));
    }
 });
 
