@@ -70,16 +70,22 @@ export const updateUser = CatchAsync(async (req, res, next) => {
       imageObj.image_url = result.secure_url;
       imageObj.public_id = result.public_id;
    }
-   console.log(imageObj)
+   console.log(imageObj);
 
-   // Update user details
-   updateUser.fullname.firstname = firstname || updateUser.fullname.firstname;
-   updateUser.fullname.lastname = lastname || updateUser.fullname.lastname;
-   updateUser.phone = phone || updateUser.phone;
-   updateUser.avatar = imageObj || updateUser.avatar;
-   updateUser.gender = gender || updateUser.gender;
+   const findUser = await User.findByIdAndUpdate(
+      user._id,
+      { $set: { avatar: imageObj }, $set: { firstname }, $set: { lastname }, $set: { phone }, $set: { gender } },
+      { new: true }
+   );
 
-   await user.save({ validateBeforeSave: true });
+   // // Update user details
+   // updateUser.fullname.firstname = firstname || updateUser.fullname.firstname;
+   // updateUser.fullname.lastname = lastname || updateUser.fullname.lastname;
+   // updateUser.phone = phone || updateUser.phone;
+   // updateUser.avatar = imageObj || updateUser.avatar;
+   // updateUser.gender = gender || updateUser.gender;
+
+   // await user.save({ validateBeforeSave: true });
 
    res.status(200).json({
       status: "success",
