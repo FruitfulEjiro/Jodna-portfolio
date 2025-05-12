@@ -75,7 +75,6 @@ export const updateUser = CatchAsync(async (req, res, next) => {
    // Update user details
    updateUser.fullname.firstname = firstname || updateUser.fullname.firstname;
    updateUser.fullname.lastname = lastname || updateUser.fullname.lastname;
-   updateUser.email = email || updateUser.email;
    updateUser.phone = phone || updateUser.phone;
    updateUser.avatar = imageObj || updateUser.avatar;
    updateUser.gender = gender || updateUser.gender;
