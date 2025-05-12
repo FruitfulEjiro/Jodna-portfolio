@@ -74,6 +74,12 @@ const AdminSchema = new mongoose.Schema({
          type: String,
       },
    },
+   gender: {
+      type: String,
+      required: false,
+      enum: ["male", "female", "rather not say"],
+      default: "rather not say",
+   },
    role: {
       type: String,
       enum: ["admin"],

@@ -11,7 +11,7 @@ import sendEmail from "../middleware/Email.js";
 
 // Signup Admin
 export const createAdmin = CatchAsync(async (req, res, next) => {
-   const { firstname, lastname, email, password } = req.body;
+   const { firstname, lastname, email, password, gender } = req.body;
 
    const duplicate = User.findOne({ email });
    if (!duplicate) return next(new AppError("A user with this email already Exists", 400));
@@ -23,6 +23,7 @@ export const createAdmin = CatchAsync(async (req, res, next) => {
       },
       email,
       password,
+      gender,
    });
 
    if (!admin) return next(new AppError("Error creating account!! Try again", 500));
@@ -56,7 +57,7 @@ export const loginAdmin = CatchAsync(async (req, res, next) => {
 
 // Signup User
 export const signup = CatchAsync(async (req, res) => {
-   const { firstname, lastname, email, password } = req.body;
+   const { firstname, lastname, email, password, gender } = req.body;
 
    const duplicate = Admin.findOne({ email });
    if (!duplicate) return next(new AppError("A user with this email already Exists", 400));
@@ -68,6 +69,7 @@ export const signup = CatchAsync(async (req, res) => {
       },
       email,
       password,
+      gender,
    });
 
    if (!user) return next(new AppError("Error creating account!! Try again", 500));

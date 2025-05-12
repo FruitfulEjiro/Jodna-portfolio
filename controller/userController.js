@@ -7,7 +7,7 @@ import { uploadImageCloudinary, deleteImageCloudinary } from "../middleware/clou
 import AppError from "../utils/AppError.js";
 
 export const updateAdmin = CatchAsync(async (req, res, next) => {
-   const { firstname, lastname, phone, avatar } = req.body;
+   const { firstname, lastname, phone, avatar, gender } = req.body;
    const admin = req.user;
 
    // Check if user exists
@@ -35,6 +35,7 @@ export const updateAdmin = CatchAsync(async (req, res, next) => {
    updateAdmin.email = email || updateAdmin.email;
    updateAdmin.phone = phone || updateAdmin.phone;
    updateAdmin.avatar = imageObj || updateAdmin.avatar;
+   updateAdmin.gender = imageObj || updateAdmin.gender;
 
    await admin.save({ validateBeforeSave: true });
 
@@ -48,7 +49,7 @@ export const updateAdmin = CatchAsync(async (req, res, next) => {
 });
 
 export const updateUser = CatchAsync(async (req, res, next) => {
-   const { firstname, lastname, phone, avatar } = req.body;
+   const { firstname, lastname, phone, avatar, gender } = req.body;
    const user = req.user;
 
    // Check if user exists
@@ -76,6 +77,7 @@ export const updateUser = CatchAsync(async (req, res, next) => {
    updateUser.email = email || updateUser.email;
    updateUser.phone = phone || updateUser.phone;
    updateUser.avatar = imageObj || updateUser.avatar;
+   updateUser.gender = imageObj || updateUser.gender;
 
    await user.save({ validateBeforeSave: true });
 
