@@ -70,6 +70,7 @@ export const updateUser = CatchAsync(async (req, res, next) => {
       imageObj.image_url = result.secure_url;
       imageObj.public_id = result.public_id;
    }
+   console.log(imageObj)
 
    // Update user details
    updateUser.fullname.firstname = firstname || updateUser.fullname.firstname;

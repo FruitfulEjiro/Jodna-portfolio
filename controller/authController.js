@@ -255,7 +255,7 @@ export const protect = CatchAsync(async (req, res, next) => {
 
       // Grant user access to the Protected Routes
       req.user = user;
-      next();
+      return next();
    }
    if (!user) {
       const admin = await Admin.findById(decoded.id);
@@ -266,7 +266,7 @@ export const protect = CatchAsync(async (req, res, next) => {
 
       // Grant user access to the Protected Routes
       req.user = admin;
-      next();
+      return next();
    }
 });
 
