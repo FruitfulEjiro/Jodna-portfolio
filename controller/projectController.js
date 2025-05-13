@@ -320,7 +320,7 @@ export const getProjectByDuration = CatchAsync(async (req, res, next) => {
    const { duration } = req.query;
 
    const project = await Project.find({ project_duration: duration }).populate("user", "fullname");
-   if (!project || project.length === 0) return next(new AppError("No project found", 404));
+   if (!project) return next(new AppError("No project found", 404));
 
    res.status(200).json({
       status: "success",
