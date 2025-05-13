@@ -107,18 +107,16 @@ export const publishDraft = CatchAsync(async (req, res, next) => {
       imageObj.public_id = result.public_id;
    }
 
-   const project = {
-      user: user_id || draftProject.user._id,
-      project_name: project_name || draftProject.project_name,
-      project_image: imageObj || draftProject.project_image,
-      project_duration: project_duration || draftProject.project_duration,
-      tech: tech || draftProject.tech,
-      project_url: project_url ? project_url : "",
-      project_description: project_description || draftProject.project_description,
-      status: "published",
-   };
+   draftProject.user = user_id || draftProject.user._id;
+   draftProject.project_name = project_name || draftProject.project_name;
+   draftProject.project_image = imageObj || draftProject.project_image;
+   draftProject.project_duration = project_duration || draftProject.project_duration;
+   draftProject.tech = tech || draftProject.tech;
+   draftProject.project_url = project_url || draftProject.project_url;
+   draftProject.project_description = project_description || draftProject.project_description;
+   draftProject.status = "published";
 
-   project.save({ validateBeforeSave: true });
+   draftProject.save({ validateBeforeSave: true });
 
    // if error, delete image from cloudinary
    if (!project) {
