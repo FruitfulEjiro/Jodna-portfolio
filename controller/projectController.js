@@ -107,6 +107,19 @@ export const publishDraft = CatchAsync(async (req, res, next) => {
       imageObj.public_id = result.public_id;
    }
 
+   if (project_image) {
+      // delete old image from cloudinary
+      if (draftProject.project_image.public_id) {
+         const deletedImage = await deleteImageCloudinary(draftProject.project_image.public_id);
+         if (!deletedImage) return next(new AppError("Couldnt delete Image!! Try again", 500));
+      }
+      // upload new image to coudinary
+      const result = await uploadImageCloudinary(project_image);
+      if (!result) return next(new AppError("Couldnt upload Image!! Try again", 500));
+      imageObj.image_url = result.secure_url;
+      imageObj.public_id = result.public_id;
+   }
+
    // convert tech to array if not an array
    let techArrr = Array.isArray(tech) ? tech : [tech];
 
