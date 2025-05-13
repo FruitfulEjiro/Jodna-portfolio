@@ -95,7 +95,7 @@ export const publishDraft = CatchAsync(async (req, res, next) => {
    const { id } = req.params;
 
    // find draft
-   const draftProject = Project.findById(id);
+   const draftProject = await Project.findById(id);
    if (!draftProject) return next(new AppError("Project not saved as draft", 404));
 
    // upload image to cloudinary
@@ -107,8 +107,11 @@ export const publishDraft = CatchAsync(async (req, res, next) => {
       imageObj.public_id = result.public_id;
    }
 
+   // convert tech to array if not an array
+   let techArrr = Array.isArray(tech) ? tech : [tech];
+
    let techArr = [];
-   tech ? (techArr = [...draftProject.tech, ...tech]) : (techArr = [...draftProject]);
+   tech ? (techArr = [...draftProject.tech, ...techArrr]) : (techArr = [...draftProject]);
 
    // Update project
    draftProject.project_name = project_name || draftProject.project_name;
