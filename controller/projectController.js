@@ -107,19 +107,28 @@ export const publishDraft = CatchAsync(async (req, res, next) => {
       imageObj.public_id = result.public_id;
    }
 
-   draftProject.user = user_id || draftProject.user._id;
+   let techArr = [];
+   tech ? (techArr = [...draftProject, ...tech]) : (techArr = [...draftProject]);
+
+   // Update project
    draftProject.project_name = project_name || draftProject.project_name;
    draftProject.project_image = imageObj || draftProject.project_image;
    draftProject.project_duration = project_duration || draftProject.project_duration;
-   draftProject.tech = tech || draftProject.tech;
+   draftProject.tech = techArr || draftProject.tech;
    draftProject.project_url = project_url || draftProject.project_url;
    draftProject.project_description = project_description || draftProject.project_description;
    draftProject.status = "published";
 
    draftProject.save({ validateBeforeSave: true });
 
+   Event.emit("project:created", {
+      projectId: draftProject._id,
+      userId: draftProject.user,
+      techArray: draftProject.tech,
+   });
+
    // if error, delete image from cloudinary
-   if (!project) {
+   if (!draftProject) {
       await deleteImageCloudinary(imageObj.public_id);
       return next(new AppError("Project not created, Try again!!", 500));
    }
@@ -128,7 +137,7 @@ export const publishDraft = CatchAsync(async (req, res, next) => {
       status: "success",
       message: "Draft saved successfully",
       data: {
-         project,
+         draftProject,
       },
    });
 });
@@ -142,6 +151,14 @@ export const deleteDraft = CatchAsync(async (req, rex, next) => {
 
    if (deleteDraft.user != user._id) return next(new AppError("user can only delete personal draft", 400));
    if (deleteDraft.status != "draft") return next(new AppError("cant delete, draft is already published", 400));
+
+   if (deleteDraft.project_image.public_id) {
+      const deleteImage = await deleteImageCloudinary(imageObj.public_id);
+      if (!deleteImage) return next(new AppError("Couldnt delete Image. Try again!!!", 500));
+   }
+
+   const deletedDraft = await Project.findByIdAndDelete(id);
+   if (!deletedDraft) return next(new AppError("Draft not deleted. Try again!!!", 500));
 
    res.status(204).json({
       status: success,
