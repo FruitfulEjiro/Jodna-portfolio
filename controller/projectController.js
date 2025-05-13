@@ -61,7 +61,7 @@ export const saveDraft = CatchAsync(async (req, res, next) => {
       imageObj.public_id = result.public_id;
    }
 
-   const project = {
+   const project = new Project({
       user: user._id,
       project_name,
       project_image: imageObj,
@@ -70,9 +70,9 @@ export const saveDraft = CatchAsync(async (req, res, next) => {
       project_url: project_url ? project_url : "",
       project_description,
       status: "draft",
-   };
+   });
 
-   project.save({ validateBeforeSave: false });
+   await project.save({ validateBeforeSave: false });
 
    // if error, delete image from cloudinary
    if (!project) {
