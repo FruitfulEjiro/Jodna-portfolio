@@ -108,7 +108,7 @@ export const publishDraft = CatchAsync(async (req, res, next) => {
    }
 
    let techArr = [];
-   tech ? (techArr = [...draftProject, ...tech]) : (techArr = [...draftProject]);
+   tech ? (techArr = [...draftProject.tech, ...tech]) : (techArr = [...draftProject]);
 
    // Update project
    draftProject.project_name = project_name || draftProject.project_name;
