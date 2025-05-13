@@ -95,7 +95,7 @@ export const publishDraft = CatchAsync(async (req, res, next) => {
    const { id } = req.params;
 
    // find draft
-   const draftProject = findById(id);
+   const draftProject = Project.findById(id);
    if (!draftProject) return next(new AppError("Project not saved as draft", 404));
 
    // upload image to cloudinary
