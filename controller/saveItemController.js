@@ -12,7 +12,58 @@ export const saveItem = CatchAsync(async (req, res, next) => {
 
    // Check if user exists
    const checkUser = await User.findById(user._id);
-   if (!checkUser) return next(new AppError("User doesn't exist", 404));
+   if (checkUser) {
+      // Check if project exists
+      const project = await Project.findById(id);
+      if (!project) return next(new AppError("Project doesn't exist", 404));
+
+      // Check if project is already saved by user
+      const isSaved = await SavedItems.findOne({ user: user._id, project: id });
+      if (isSaved) return next(new AppError("User already save this project", 400));
+
+      // Save project
+      const saveProject = await SavedItems.create({
+         user: user._id,
+         project: id,
+      });
+      if (!saveProject) return next(new AppError("Couldn't save project. Try again!!", 500));
+
+      res.status(200).json({
+         status: "success",
+         message: "Project saved successfully",
+         data: {
+            saveProject,
+         },
+      });
+   } else if (!checkUser) {
+      const checkAdmin = await Admin.findById(user._id);
+      if (!checkAdmin) return next(new AppError("User doesnt exist", 404));
+
+      // Check if project exists
+      const project = await Project.findById(id);
+      if (!project) return next(new AppError("Project doesn't exist", 404));
+
+      // Check if project is already saved by user
+      const isSaved = await SavedItems.findOne({ user: user._id, project: id });
+      if (isSaved) return next(new AppError("User already save this project", 400));
+
+      // Save project
+      const saveProject = await SavedItems.create({
+         user: user._id,
+         project: id,
+      });
+      if (!saveProject) return next(new AppError("Couldn't save project. Try again!!", 500));
+
+      res.status(200).json({
+         status: "success",
+         message: "Project saved successfully",
+         data: {
+            saveProject,
+         },
+      });
+   } else {
+      return next(new AppError("User doesn't exist", 404));
+   }
 
    // Check if project exists
    const project = await Project.findById(id);
