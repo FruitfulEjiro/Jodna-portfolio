@@ -97,7 +97,7 @@ export const deleteAdmin = CatchAsync(async (req, res, next) => {
       if (!deleteImage) return next(new AppError("Couldnt delete Image!! Try again", 500));
    }
 
-   const deleteAdmin = await User.findByIdAndDelete(id);
+   const deleteAdmin = await User.findByIdAndDelete(user._id);
    if (!deleteAdmin) return next(new AppError("Couldn't delete admin. Try again!!", 500));
 
    res.status(204).json({
