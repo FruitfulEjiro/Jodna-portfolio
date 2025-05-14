@@ -131,7 +131,7 @@ export const deleteUser = CatchAsync(async (req, res, next) => {
 
    const checkUser = await User.findById(user._id);
    if (!checkUser) return next(new AppError("User doesn't exist", 404));
-   if (checkUser.avatar) {
+   if (checkUser.avatar.public_id) {
       // delete avatar from cloudinary
       const deleteImage = await deleteImageCloudinary(checkUser.avatar.public_id);
       if (!deleteImage) return next(new AppError("Couldnt delete Image!! Try again", 500));
