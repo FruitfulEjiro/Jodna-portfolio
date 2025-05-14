@@ -87,9 +87,9 @@ export const updateUser = CatchAsync(async (req, res, next) => {
 });
 
 export const deleteAdmin = CatchAsync(async (req, res, next) => {
-   const { id } = req.params;
+   const user = req.user;
 
-   const admin = await Admin.findById(id);
+   const admin = await Admin.findById(user._id);
    if (!admin) return next(new AppError("Admin doesn't exist", 404));
    if (admin.avatar.public_id) {
       // delete avatar from cloudinary
