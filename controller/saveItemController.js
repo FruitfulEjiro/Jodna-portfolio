@@ -2,6 +2,7 @@ import CatchAsync from "express-async-handler";
 
 // Local Modules
 import User from "../model/User.js";
+import Admin from "..//model/Admin.js";
 import Project from "../model/Project.js";
 import SavedItems from "../model/SavedItems.js";
 import AppError from "../utils/AppError.js";
