@@ -147,22 +147,44 @@ export const unsaveItem = CatchAsync(async (req, res, next) => {
 
    // Check if user exists
    const checkUser = await User.findById(user._id);
-   if (!checkUser) return next(new AppError("User doesn't exist", 404));
+   if (checkUser) {
+      // Check if project exists
+      const project = await Project.findById(id);
+      if (!project) return next(new AppError("Project doesn't exist", 404));
 
-   // Check if project exists
-   const project = await Project.findById(id);
-   if (!project) return next(new AppError("Project doesn't exist", 404));
+      // Check if project was saved by same user
+      const isSaved = await SavedItems.findOne({ user: user._id, project: id });
+      if (!isSaved) return next(new AppError("User haven't saved this project", 400));
 
-   // Check if project was saved by same user
-   const isSaved = await SavedItems.findOne({ user: user._id, project: id });
-   if (!isSaved) return next(new AppError("User haven't saved this project", 400));
+      // unsave project
+      const unsaveProject = await SavedItems.findOneAndDelete({ user: user._id, project: id });
+      if (!unsaveProject) return next(new AppError("Couldn't remove project from saved items. Try again!!", 500));
 
-   // unsave project
-   const unsaveProject = await SavedItems.findOneAndDelete({ user: user._id, project: id });
-   if (!unsaveProject) return next(new AppError("Couldn't remove project from saved items. Try again!!", 500));
+      res.status(204).json({
+         status: "success",
+         message: "Project unsaved successfully",
+      });
+   } else if (!checkUser) {
+      const checkAdmin = await Admin.findById(user._id);
+      if (!checkAdmin) return next(new AppError("User doesn't exist", 404));
 
-   res.status(204).json({
-      status: "success",
-      message: "Project unsaved successfully",
-   });
+      // Check if project exists
+      const project = await Project.findById(id);
+      if (!project) return next(new AppError("Project doesn't exist", 404));
+
+      // Check if project was saved by same user
+      const isSaved = await SavedItems.findOne({ user: user._id, project: id });
+      if (!isSaved) return next(new AppError("User haven't saved this project", 400));
+
+      // unsave project
+      const unsaveProject = await SavedItems.findOneAndDelete({ user: user._id, project: id });
+      if (!unsaveProject) return next(new AppError("Couldn't remove project from saved items. Try again!!", 500));
+
+      res.status(204).json({
+         status: "success",
+         message: "Project unsaved successfully",
+      });
+   } else {
+      return next(new AppError("User doesn't exist", 404));
+   }
 });
