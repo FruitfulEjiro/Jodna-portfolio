@@ -96,7 +96,36 @@ export const getSavedItems = CatchAsync(async (req, res, next) => {
 
    // Check if user exists
    const checkUser = await User.findById(user._id);
-   if (!checkUser) return next(new AppError("User doesn't exist", 404));
+   if (checkUser) {
+      // Get saved items
+      const savedItems = await SavedItems.find({ user: user._id }).populate("project");
+      if (!savedItems) return next(new AppError("No saved items found", 404));
+
+      res.status(200).json({
+         status: "success",
+         message: savedItems.length > 0 ? "Saved items retrieved successfully" : "No items found",
+         data: {
+            savedItems,
+         },
+      });
+   } else if (!checkUser) {
+      const checkAdmin = await Admin.findById(user._id);
+      if (!checkAdmin) return next(new AppError("User doesn't exist", 404));
+
+      // Get saved items
+      const savedItems = await SavedItems.find({ user: user._id }).populate("project");
+      if (!savedItems) return next(new AppError("No saved items found", 404));
+
+      res.status(200).json({
+         status: "success",
+         message: savedItems.length > 0 ? "Saved items retrieved successfully" : "No items found",
+         data: {
+            savedItems,
+         },
+      });
+   } else {
+      return next(new AppError("User doesn't exist", 404));
+   }
 
    // Get saved items
    const savedItems = await SavedItems.find({ user: user._id }).populate("project");
