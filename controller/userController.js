@@ -91,7 +91,7 @@ export const deleteAdmin = CatchAsync(async (req, res, next) => {
 
    const admin = await Admin.findById(id);
    if (!admin) return next(new AppError("Admin doesn't exist", 404));
-   if (admin.avatar) {
+   if (admin.avatar.public_id) {
       // delete avatar from cloudinary
       const deleteImage = await deleteImageCloudinary(admin.avatar.public_id);
       if (!deleteImage) return next(new AppError("Couldnt delete Image!! Try again", 500));
@@ -111,7 +111,7 @@ export const deleteUserByAdmin = CatchAsync(async (req, res, next) => {
 
    const user = await User.findById(id);
    if (!user) return next(new AppError("User doesn't exist", 404));
-   if (user.avatar) {
+   if (user.avatar.public_id) {
       // delete avatar from cloudinary
       const deleteImage = await deleteImageCloudinary(user.avatar.public_id);
       if (!deleteImage) return next(new AppError("Couldnt delete Image!! Try again", 500));
