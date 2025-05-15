@@ -127,7 +127,7 @@ export const getProjectCreatedIn = CatchAsync(async (req, res, next) => {
 export const getHighestViewedProject = CatchAsync(async (req, res, next) => {
    const { limit } = req.query;
 
-   const projects = await Project.find().sort({ total_views: 1 }).limit(Number(limit));
+   const projects = await Project.find().sort({ total_views: -1 }).limit(Number(limit));
    if (!projects) return next(new AppError("no projects found", 404));
 
    res.status(200).json({
