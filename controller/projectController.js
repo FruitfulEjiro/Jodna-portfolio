@@ -7,7 +7,7 @@ import AppError from "../utils/AppError.js";
 import Event from "../events/eventEmitter.js";
 
 export const createProject = CatchAsync(async (req, res, next) => {
-   const { project_name, project_duration, project_image, tech, project_url, project_description } = req.body;
+   const { project_name, period, count, project_image, tech, project_url, project_description } = req.body;
    const user = req.user;
 
    let imageObj = {};
@@ -22,7 +22,10 @@ export const createProject = CatchAsync(async (req, res, next) => {
       user: user._id,
       project_name,
       project_image: imageObj,
-      project_duration,
+      project_duration: {
+         period,
+         count: Number(count),
+      },
       tech,
       project_url: project_url ? project_url : "",
       project_description,
@@ -34,11 +37,11 @@ export const createProject = CatchAsync(async (req, res, next) => {
       return next(new AppError("Project not created, Try again!!", 500));
    }
 
-   Event.emit("project:created", {
-      projectId: project._id,
-      userId: user._id,
-      techArray: project.tech,
-   });
+   // Event.emit("project:created", {
+   //    projectId: project._id,
+   //    userId: user._id,
+   //    techArray: project.tech,
+   // });
 
    res.status(201).json({
       status: "success",
@@ -50,7 +53,7 @@ export const createProject = CatchAsync(async (req, res, next) => {
 });
 
 export const saveDraft = CatchAsync(async (req, res, next) => {
-   const { project_name, project_duration, project_image, tech, project_url, project_description } = req.body;
+   const { project_name, count, period, project_image, tech, project_url, project_description } = req.body;
    const user = req.user;
 
    let imageObj = {};
@@ -65,7 +68,10 @@ export const saveDraft = CatchAsync(async (req, res, next) => {
       user: user._id,
       project_name,
       project_image: imageObj,
-      project_duration,
+      project_duration: {
+         count: Number(count),
+         period,
+      },
       tech,
       project_url: project_url ? project_url : "",
       project_description,
@@ -90,22 +96,13 @@ export const saveDraft = CatchAsync(async (req, res, next) => {
 });
 
 export const publishDraft = CatchAsync(async (req, res, next) => {
-   const { project_name, project_duration, project_image, tech, project_url, project_description } = req.body;
+   const { project_name, count, period, project_image, tech, project_url, project_description } = req.body;
    const user = req.user;
    const { id } = req.params;
 
    // find draft
-   const draftProject = await Project.findById(id);
+   const draftProject = await Project.findOne({ _id: id, user: user._id });
    if (!draftProject) return next(new AppError("Project not saved as draft", 404));
-
-   // upload image to cloudinary
-   let imageObj = {};
-   if (project_image) {
-      const result = await uploadImageCloudinary(project_image);
-      if (!result) return next(new AppError("Couldnt upload Image!! Try again", 500));
-      imageObj.image_url = result.secure_url;
-      imageObj.public_id = result.public_id;
-   }
 
    if (project_image) {
       // delete old image from cloudinary
@@ -124,23 +121,29 @@ export const publishDraft = CatchAsync(async (req, res, next) => {
    let techArrr = Array.isArray(tech) ? tech : [tech];
 
    let techArr = [];
-   tech ? (techArr = [...draftProject.tech, ...techArrr]) : (techArr = [...draftProject]);
+   tech ? (techArr = [...draftProject.tech, ...techArrr]) : (techArr = [...draftProject.tech]);
 
    // Update project
-   draftProject.project_name = project_name || draftProject.project_name;
-   draftProject.project_image = imageObj || draftProject.project_image;
-   draftProject.project_duration = project_duration || draftProject.project_duration;
-   draftProject.tech = techArr || draftProject.tech;
-   draftProject.project_url = project_url || draftProject.project_url;
-   draftProject.project_description = project_description || draftProject.project_description;
-   draftProject.status = "published";
-
-   draftProject.save({ validateBeforeSave: true });
+   const updatedProject = await Project.findByIdAndUpdate(
+      id,
+      {
+         $set: {
+            project_name: project_name,
+            project_image,
+            project_duration: { period, count },
+            tech: techArr,
+            project_url,
+            project_description,
+            status: "published",
+         },
+      },
+      { new: true, runValidators: true }
+   );
 
    Event.emit("project:created", {
-      projectId: draftProject._id,
-      userId: draftProject.user,
-      techArray: draftProject.tech,
+      projectId: updatedProject._id,
+      userId: updatedProject.user,
+      techArray: updatedProject.tech,
    });
 
    // if error, delete image from cloudinary
@@ -153,7 +156,7 @@ export const publishDraft = CatchAsync(async (req, res, next) => {
       status: "success",
       message: "Draft saved successfully",
       data: {
-         draftProject,
+         updatedProject,
       },
    });
 });
@@ -199,7 +202,7 @@ export const getDrafts = CatchAsync(async (req, res, next) => {
 });
 
 export const updateProject = CatchAsync(async (req, res, next) => {
-   const { project_name, project_image, project_duration, tech, project_url, project_description } = req.body;
+   const { project_name, project_image, count, period, tech, project_url, project_description } = req.body;
    const { id } = req.params;
 
    const project = await Project.findById(id);
@@ -221,7 +224,8 @@ export const updateProject = CatchAsync(async (req, res, next) => {
    // Update project
    if (project_name) project.project_name = project_name;
    if (project_image) project.project_image = imageObj;
-   if (project_duration) project.project_duration = project_duration;
+   if (period) project.project_duration.period = period;
+   if (count) project.project_duration.count = count;
    if (tech) project.tech = tech;
    if (project_url) project.project_url = project_url;
    if (project_description) project.project_description = project_description;
@@ -304,22 +308,6 @@ export const getProjectByUser = CatchAsync(async (req, res, next) => {
    const { id } = req.params;
 
    const project = await Project.find({ user: id }).populate("user", "fullname");
-   if (!project) return next(new AppError("No project found", 404));
-
-   res.status(200).json({
-      status: "success",
-      message: project.length == 0 ? "No project found" : "project retrieved successfully",
-      result: project.length,
-      data: {
-         project,
-      },
-   });
-});
-
-export const getProjectByDuration = CatchAsync(async (req, res, next) => {
-   const { duration } = req.query;
-
-   const project = await Project.find({ project_duration: duration }).populate("user", "fullname");
    if (!project) return next(new AppError("No project found", 404));
 
    res.status(200).json({

@@ -6,7 +6,6 @@ import {
    createProject,
    updateProject,
    getProjectByName,
-   getProjectByDuration,
    getProjectByTech,
    getProjectById,
    deleteProject,
@@ -26,7 +25,6 @@ router
    .post("/draft", protect, saveDraft)
    .get("/get-all-draft", protect, getDrafts)
    .get("/all", protect, restrict, getProjects)
-   .get("/duration", getProjectByDuration)
    .get("/tech", getProjectByTech)
    .get("/name", getProjectByName)
    .get("/user", protect, getProjectByOwnUser)
