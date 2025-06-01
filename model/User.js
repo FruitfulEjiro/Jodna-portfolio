@@ -116,7 +116,7 @@ UserSchema.pre("save", async function (next) {
    next();
 });
 
-// Document middleware to set passwordChangedAt date whwnever password is updated by user
+// Document middleware to set passwordChangedAt date whenever password is updated by user
 UserSchema.pre("save", function (next) {
    if (!this.isModified("password") || this.isNew) return next();
    this.passwordChangedAt = Date.now() - 1000;

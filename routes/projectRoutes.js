@@ -24,7 +24,7 @@ router
    .post("/create", protect, createProject)
    .post("/draft", protect, saveDraft)
    .get("/get-all-draft", protect, getDrafts)
-   .get("/all", protect, restrict, getProjects)
+   .get("/all", getProjects)
    .get("/tech", getProjectByTech)
    .get("/name", getProjectByName)
    .get("/user", protect, getProjectByOwnUser)

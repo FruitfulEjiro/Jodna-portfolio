@@ -17,6 +17,7 @@ import {
 
 const router = express.Router();
 
+// www.my-api.com/auth/admin/create
 router
    .post("/admin/create", createAdmin)
    .post("/admin/login", loginAdmin)
