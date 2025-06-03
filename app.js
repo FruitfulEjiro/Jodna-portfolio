@@ -12,7 +12,26 @@ import saveRoutes from "./routes/saveItemRoutes.js";
 
 const app = express();
 
-app.use(cors());
+const allowedOrigins = [
+   "https://portfolio-project-jffm.vercel.app/",
+   "https://portfolio-project-sage-five.vercel.app",
+   "http://127.0.0.1:5500",
+   "file:///C:/Users/uk/Desktop/team%20B/repo",
+];
+
+app.use(
+   cors({
+      origin: (origin, callback) => {
+         if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+         } else {
+            callback(new Error("Not allowed by CORS"));
+         }
+      },
+      credentials: true,
+   })
+);
+// app.use(cors());
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
