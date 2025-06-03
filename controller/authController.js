@@ -44,7 +44,7 @@ export const loginAdmin = CatchAsync(async (req, res, next) => {
 
    const lowerEmail = email.toLowerCase();
    // Find User by email
-   const admin = await Admin.findOne({ lowerEmail }).select("+password");
+   const admin = await Admin.findOne({ email: lowerEmail }).select("+password");
 
    if (!admin || !(await admin.comparePassword(password)))
       return next(new AppError("Incorrect Email or Password", 401));
@@ -92,7 +92,7 @@ export const login = CatchAsync(async (req, res, next) => {
 
    const lowerEmail = email.toLowerCase();
    // Find User by email
-   const user = await User.findOne({ lowerEmail }).select("+password");
+   const user = await User.findOne({ email: lowerEmail }).select("+password");
 
    if (!user || !(await user.comparePassword(password))) return next(new AppError("Incorrect Email or Password", 401));
 
