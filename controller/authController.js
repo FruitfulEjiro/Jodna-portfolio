@@ -24,7 +24,7 @@ export const createAdmin = CatchAsync(async (req, res, next) => {
       },
       email: lowerEmail,
       password,
-      gender: gender || "rather not say",
+      gender: "rather not say",
    });
 
    if (!admin) return next(new AppError("Error creating account!! Try again", 500));
@@ -72,7 +72,7 @@ export const signup = CatchAsync(async (req, res) => {
       },
       email: lowerEmail,
       password,
-      gender: gender || "rather not say",
+      gender: "rather not say",
    });
 
    if (!user) return next(new AppError("Error creating account!! Try again", 500));
