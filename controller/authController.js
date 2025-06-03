@@ -11,9 +11,10 @@ import sendEmail from "../middleware/Email.js";
 
 // Signup Admin
 export const createAdmin = CatchAsync(async (req, res, next) => {
-   const { firstname, lastname, email, password, gender } = req.body;
+   const { firstname, lastname, email, password } = req.body;
 
-   const duplicate = User.findOne({ email });
+   const lowerEmail = email.toLowerCase();
+   const duplicate = User.findOne({ lowerEmail });
    if (!duplicate) return next(new AppError("A user with this email already Exists", 400));
 
    const admin = await Admin.create({
@@ -21,7 +22,7 @@ export const createAdmin = CatchAsync(async (req, res, next) => {
          firstname,
          lastname,
       },
-      email,
+      email: lowerEmail,
       password,
       gender: gender || "rather not say",
    });
@@ -41,8 +42,9 @@ export const loginAdmin = CatchAsync(async (req, res, next) => {
    // Check if email and password exist
    if (!email || !password) return next(new AppError("Please Provide Email and Password", 400));
 
+   const lowerEmail = email.toLowerCase();
    // Find User by email
-   const admin = await Admin.findOne({ email }).select("+password");
+   const admin = await Admin.findOne({ lowerEmail }).select("+password");
 
    if (!admin || !(await admin.comparePassword(password)))
       return next(new AppError("Incorrect Email or Password", 401));
@@ -57,9 +59,10 @@ export const loginAdmin = CatchAsync(async (req, res, next) => {
 
 // Signup User
 export const signup = CatchAsync(async (req, res) => {
-   const { firstname, lastname, email, password, gender, phone } = req.body;
+   const { firstname, lastname, email, password } = req.body;
 
-   const duplicate = Admin.findOne({ email });
+   const lowerEmail = email.toLowerCase();
+   const duplicate = Admin.findOne({ lowerEmail });
    if (!duplicate) return next(new AppError("A user with this email already Exists", 400));
 
    const user = await User.create({
@@ -67,10 +70,9 @@ export const signup = CatchAsync(async (req, res) => {
          firstname,
          lastname,
       },
-      email,
+      email: lowerEmail,
       password,
       gender: gender || "rather not say",
-      phone
    });
 
    if (!user) return next(new AppError("Error creating account!! Try again", 500));
@@ -88,9 +90,9 @@ export const login = CatchAsync(async (req, res, next) => {
    // Check if email and password exist
    if (!email || !password) return next(new AppError("Please Provide Email and Password", 400));
 
+   const lowerEmail = email.toLowerCase();
    // Find User by email
-
-   const user = await User.findOne({ email }).select("+password");
+   const user = await User.findOne({ lowerEmail }).select("+password");
 
    if (!user || !(await user.comparePassword(password))) return next(new AppError("Incorrect Email or Password", 401));
 
@@ -106,9 +108,12 @@ export const login = CatchAsync(async (req, res, next) => {
 export const forgotPassword = CatchAsync(async (req, res, next) => {
    const { email } = req.body;
 
+   const lowerEmail = email.toLowerCase();
    // Get user from Database
    let user;
-   (await User.findOne({ email })) ? (user = await User.findOne({ email })) : (user = await Admin.findOne({ email }));
+   (await User.findOne({ lowerEmail }))
+      ? (user = await User.findOne({ lowerEmail }))
+      : (user = await Admin.findOne({ lowerEmail }));
    if (!user) return next(new AppError("No User with this Email was found", 404));
    // Generate random reset token
    const resetToken = await user.createPasswordResetToken();
@@ -137,7 +142,7 @@ export const forgotPassword = CatchAsync(async (req, res, next) => {
   </div>`;
 
    try {
-      await sendEmail(email, "Your Password Reset Token (Valid for 10 mins)", message, html);
+      await sendEmail(lowerEmail, "Your Password Reset Token (Valid for 10 mins)", message, html);
 
       res.status(200).json({
          status: "success",
