@@ -94,6 +94,7 @@ export const login = CatchAsync(async (req, res, next) => {
    // Find User by email
    const user = await User.findOne({ email: lowerEmail }).select("+password");
 
+   console.log(lowerEmail, user);
    if (!user || !(await user.comparePassword(password))) return next(new AppError("Incorrect Email or Password", 401));
 
    const userObj = user.toObject();
