@@ -15,14 +15,15 @@ const app = express();
 const allowedOrigins = [
    "https://portfolio-project-jffm.vercel.app/",
    "https://portfolio-project-sage-five.vercel.app",
+   "https://portfolio-project-alpha-blush.vercel.app",
    "http://127.0.0.1:5500",
    "http://127.0.0.1:5501",
    "http://127.0.0.1:5502",
    "http://127.0.0.1:5504",
    "http://127.0.0.1:5505",
    "http://127.0.0.1:5173",
-   "http://127.0.0.1:5173",
-   "file:///C:/Users/uk/Desktop/team%20B/repo",
+   "http://127.0.0.1:5174",
+   "http://127.0.0.1:5174",
 ];
 
 app.use(
