@@ -13,7 +13,7 @@ import saveRoutes from "./routes/saveItemRoutes.js";
 const app = express();
 
 const allowedOrigins = [
-   "https://portfolio-project-jffm.vercel.app/",
+   "https://portfolio-project-jffm.vercel.app",
    "https://portfolio-project-sage-five.vercel.app",
    "https://portfolio-project-alpha-blush.vercel.app",
    "http://127.0.0.1:5500",
