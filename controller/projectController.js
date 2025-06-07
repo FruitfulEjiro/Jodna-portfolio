@@ -23,7 +23,7 @@ export const createProject = CatchAsync(async (req, res, next) => {
       project_name,
       project_image: imageObj,
       project_duration: {
-         period,
+         period: period.toLowerCase(),
          count: Number(count),
       },
       tech,
@@ -70,7 +70,7 @@ export const saveDraft = CatchAsync(async (req, res, next) => {
       project_image: imageObj,
       project_duration: {
          count: Number(count),
-         period,
+         period: period.toLowerCase(),
       },
       tech,
       project_url: project_url ? project_url : "",
@@ -130,7 +130,7 @@ export const publishDraft = CatchAsync(async (req, res, next) => {
          $set: {
             project_name: project_name,
             project_image,
-            project_duration: { period, count },
+            project_duration: { period: period.toLowerCase(), count },
             tech: techArr,
             project_url,
             project_description,
@@ -224,7 +224,7 @@ export const updateProject = CatchAsync(async (req, res, next) => {
    // Update project
    if (project_name) project.project_name = project_name;
    if (project_image) project.project_image = imageObj;
-   if (period) project.project_duration.period = period;
+   if (period) project.project_duration.period = period.toLowerCase();
    if (count) project.project_duration.count = count;
    if (tech) project.tech = tech;
    if (project_url) project.project_url = project_url;
