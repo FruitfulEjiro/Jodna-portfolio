@@ -94,7 +94,6 @@ export const login = CatchAsync(async (req, res, next) => {
    // Find User by email
    const user = await User.findOne({ email: lowerEmail }).select("+password");
 
-   console.log(lowerEmail, user);
    if (!user || !(await user.comparePassword(password))) return next(new AppError("Incorrect Email or Password", 401));
 
    const userObj = user.toObject();
@@ -245,7 +244,6 @@ export const updateAdminPassword = CatchAsync(async (req, res, next) => {
 
 // Protect middleware
 export const protect = CatchAsync(async (req, res, next) => {
-   console.log("cookies", req.cookies);
    // Retrieve the token from cookie
    let token = req.cookies.jwt;
 
