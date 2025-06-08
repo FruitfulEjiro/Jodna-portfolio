@@ -245,6 +245,7 @@ export const updateAdminPassword = CatchAsync(async (req, res, next) => {
 
 // Protect middleware
 export const protect = CatchAsync(async (req, res, next) => {
+   console.log(req.cookie);
    // Retrieve the token from cookie
    let token = req.cookies.jwt;
 
