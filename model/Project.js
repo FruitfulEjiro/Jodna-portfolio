@@ -21,13 +21,14 @@ const ProjectSchema = new mongoose.Schema({
       },
    },
    project_duration: {
-      count: {
-         type: Number,
-      },
-      period: {
-         type: String,
-         enum: ["day", "month", "year"],
-      },
+      type: String,
+      // count: {
+      //    type: Number,
+      // },
+      // period: {
+      //    type: String,
+      //    enum: ["day", "month", "year"],
+      // },
    },
    total_views: {
       type: Number,

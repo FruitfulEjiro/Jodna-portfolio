@@ -22,10 +22,7 @@ export const createProject = CatchAsync(async (req, res, next) => {
       user: user._id,
       project_name,
       project_image: imageObj,
-      project_duration: {
-         period: period.toLowerCase(),
-         count: Number(count),
-      },
+      project_duration: `${count} ${period.toLowerCase()}`,
       tech,
       project_url: project_url ? project_url : "",
       project_description,
@@ -37,11 +34,11 @@ export const createProject = CatchAsync(async (req, res, next) => {
       return next(new AppError("Project not created, Try again!!", 500));
    }
 
-   // Event.emit("project:created", {
-   //    projectId: project._id,
-   //    userId: user._id,
-   //    techArray: project.tech,
-   // });
+   Event.emit("project:created", {
+      projectId: project._id,
+      userId: user._id,
+      techArray: project.tech,
+   });
 
    res.status(201).json({
       status: "success",
@@ -68,10 +65,7 @@ export const saveDraft = CatchAsync(async (req, res, next) => {
       user: user._id,
       project_name,
       project_image: imageObj,
-      project_duration: {
-         count: Number(count),
-         period: period.toLowerCase(),
-      },
+      project_duration: `${count} ${period.toLowerCase()}`,
       tech,
       project_url: project_url ? project_url : "",
       project_description,
@@ -130,7 +124,7 @@ export const publishDraft = CatchAsync(async (req, res, next) => {
          $set: {
             project_name: project_name,
             project_image,
-            project_duration: { period: period.toLowerCase(), count },
+            project_duration: `${count} ${period.toLowerCase()}`,
             tech: techArr,
             project_url,
             project_description,
@@ -224,8 +218,7 @@ export const updateProject = CatchAsync(async (req, res, next) => {
    // Update project
    if (project_name) project.project_name = project_name;
    if (project_image) project.project_image = imageObj;
-   if (period) project.project_duration.period = period.toLowerCase();
-   if (count) project.project_duration.count = count;
+   if (period && count) project.project_duration = `${count} ${period.toLowerCase()}`;
    if (tech) project.tech = tech;
    if (project_url) project.project_url = project_url;
    if (project_description) project.project_description = project_description;
