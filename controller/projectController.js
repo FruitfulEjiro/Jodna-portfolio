@@ -5,6 +5,7 @@ import Project from "../model/Project.js";
 import { uploadImageCloudinary, deleteImageCloudinary } from "../middleware/cloudinary.js";
 import AppError from "../utils/AppError.js";
 import Event from "../events/eventEmitter.js";
+import Analytics from "../model/Analytics.js";
 
 export const createProject = CatchAsync(async (req, res, next) => {
    const { project_name, period, count, project_image, tech, project_url, project_description } = req.body;
@@ -379,6 +380,11 @@ export const deleteProject = CatchAsync(async (req, res, next) => {
       const deleteImage = await deleteImageCloudinary(public_id);
       if (!deleteImage) return next(new AppError("Couldnt delete Image. Try again!!!", 500));
    }
+
+   // delete project analytics
+   const deleteAnalytics = await Analytics.deleteMany({ projectId: id });
+   if (!deleteAnalytics) return next(new AppError("Couldnt delete Analytics. Try again!!!", 500));
+
    // delete project
    const deletedProject = await Project.findByIdAndDelete(id);
    if (!deletedProject) return next(new AppError("Project not deleted. Try again!!!", 500));
